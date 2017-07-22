@@ -24,9 +24,13 @@ properly.
 ```bash
 $ pip install -r requirements.txt
 ```
-3. Run the app using the following command:
+3. This project was made with Heroku in mind; download the Heroku-CLI. See their
+[documentation](https://devcenter.heroku.com/articles/heroku-cli) for more
+details.
+4. Run the app using the following command:
 ```bash
-$ FLASK_APP=server/routes.py flask run
+$ heroku local
 ```
 This will create a development-friendly server and host the
-application on http://localhost:5000.
+application on http://localhost:5000. It will set all environment variables from
+the `.env` file and run the worker for you as well.
