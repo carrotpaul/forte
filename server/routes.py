@@ -1,10 +1,13 @@
-from authenticate import authenticate
 from flask import Flask, request, abort
-app = Flask(__name__)
+from authenticate import authenticate
+from worker import download_from_source
 
-@app.route('/download', methods=['POST'])
+_servlet = Flask(__name__)
+
+@_servlet.route('/download', methods=['POST'])
 def download():
-    password = request.get_json()['token']
-    if authenticate(password):
-        return 'Authentication successful'
+    json_data = request.get_json()
+    if authenticate(json_data['token']):
+        download_from_source.delay(json_data['url'])
+        return 'Authentication successful\n'
     abort(401)
