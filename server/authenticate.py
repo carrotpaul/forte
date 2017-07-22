@@ -1,5 +1,5 @@
+from binascii import unhexlify
 import os, hashlib
-from binascii import hexlify, unhexlify
 
 def salt_and_pepper(byte_password):
     salt = b'XHy5tpl2VHvn83A4_OUOP$x/6VcDBduPZ3wh/QF/b9Fk+fCoXXj12FCdhjc7J+Zry'
