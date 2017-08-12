@@ -2,5 +2,5 @@
 .gitignore
 env/
 .env
-Procfile
 *.md
+tmp/
