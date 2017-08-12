@@ -10,14 +10,12 @@ ADD . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
 
-# Make port 80 available to the world outside this container
-EXPOSE 5000
-
 # Define environment variable
 ENV AUTH_SECRET ""
 ENV AUTH_PASSWORD ""
-ENV CELERY_BROKER_URL ""
-ENV FLASK_APP "server/routes.py"
+ENV KAFKA_CONSUMER_TOPIC "forte-download"
+# If you're using Docker for Mac, replace localhost with your machine's en0
+ENV KAFKA_CONSUMER_BROKERS "localhost:9092"
 
 # Run app.py when the container launches
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["python", "server/consumer.py"]

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import youtube_dl
-import hashlib
+import os, hashlib
 
 class MyLogger(object):
     def debug(self, msg):
@@ -10,16 +10,17 @@ class MyLogger(object):
         print(msg)
 
     def error(self, msg):
-        print(msg) 
+        print(msg)
 
 def execute_dl(url):
+    parent_path = os.environ.get('YOUTUBEDL_DOWNLOAD_PATH') or os.getcwd()
     filename = hashlib.sha1(url).hexdigest()
-    parent_path = os.path.dirname(os.getcwd())
+    file_path = parent_path + '/tmp/' + filename
 
     options = {
         'format': 'bestaudio/best',
         'logger' : MyLogger(),
-        'outtmpl': parent_path + '/tmp/' + filename + '.%(ext)s',
+        'outtmpl': file_path + '.%(ext)s',
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
@@ -28,4 +29,6 @@ def execute_dl(url):
     }
 
     with youtube_dl.YoutubeDL(options) as ydl:
-        ydl.download([source])
+        # If everything is successful, _download_retcode returns 0
+        if not ydl.download([url]):
+            return file_path + '.mp3'
