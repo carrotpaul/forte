@@ -12,20 +12,26 @@ services:
     ports:
       - "2181:2181"
   kafka:
-    image: ches/kafka
+    image: confluentinc/cp-kafka
     ports:
       - "9092:9092"
     depends_on:
       - zookeeper
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
-      ZOOKEEPER_IP: zookeeper
-  # kafka-rest:
-  #   image: confluentinc/cp-kafka-rest
-  #   ports:
-  #     - "8082:8082"
-  #   environment:
-  #     KAFKA_REST_HOST_NAME: 127.0.0.1
-  #     KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # If you're using Docker for Mac, replace localhost with your machine's en0
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  kafka-rest:
+    image: confluentinc/cp-kafka-rest
+    ports:
+      - "8082:8082"
+    depends_on:
+      - zookeeper
+      - kafka
+    environment:
+      # If you're using Docker for Mac, replace localhost with your machine's en0
+      KAFKA_REST_HOST_NAME: localhost:8082
+      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
 networks:
   webnet:
