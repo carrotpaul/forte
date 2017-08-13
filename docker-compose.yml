@@ -2,10 +2,15 @@ version: "3"
 services:
   web:
     image: forte
-    ports:
-      - "80:5000"
-    networks:
-      - webnet
+    restart: on-failure
+    depends_on:
+      - zookeeper
+      - kafka
+    environment:
+      KAFKA_CONSUMER_TOPIC: "forte-download"
+      KAFKA_CONSUMER_BROKERS: kafka:9092
+    volumes:
+      - ./server:/app/server
   zookeeper:
     image: zookeeper
     restart: unless-stopped
@@ -19,8 +24,7 @@ services:
       - zookeeper
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      # If you're using Docker for Mac, replace localhost with your machine's en0
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
   kafka-rest:
     image: confluentinc/cp-kafka-rest
@@ -30,8 +34,5 @@ services:
       - zookeeper
       - kafka
     environment:
-      # If you're using Docker for Mac, replace localhost with your machine's en0
       KAFKA_REST_HOST_NAME: localhost:8082
       KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
-networks:
-  webnet:
