@@ -3,13 +3,30 @@ from kafka.errors import KafkaError
 from task.download import execute_dl
 # from task.upload import execute_up
 from pprint import pprint
-import os, json
+import os, time, json
 
 class KafConsumer(object):
-    def __init__(self, servers, topic):
-        self.consumer = KafkaConsumer(topic,
-            group_id='forte-server',
-            bootstrap_servers=servers)
+    def __init__(self, servers, topic, max_backoff = 10):
+        backoff = 0.5
+
+        while (backoff < max_backoff):
+            try:
+                self.consumer = KafkaConsumer(topic,
+                    group_id='forte-server',
+                    bootstrap_servers=servers)
+
+                print ("Established connection to Kafka with brokers %s" % servers)
+                return
+            except KafkaError as exception:
+                backoff = backoff * 2
+
+                plural_string = "second" if backoff == 1 else "seconds"
+                print ("Kafka is not ready yet: %s. Retrying in %d %s..." %
+                    (exception, backoff, plural_string))
+
+                time.sleep(backoff)
+
+        raise Exception("Could not connect to Kafka within timeout. Aborting.")
 
     def consume_events(self):
         print('Starting the consumer...')
