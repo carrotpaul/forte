@@ -14,12 +14,22 @@ site you are currently browsing from.
 
 1. This project was made with Docker in mind. You can download Docker via their [official site](https://www.docker.com/get-docker).
 
-2. Before you can run `docker-compose`, you will be required to build the image for the source code. You may tag the build as you wish (as long as the name is still `forte`).
+2. For the application to work, you will need to set an authorization token. The app itself authenticates using a salt & pepper hashing algorithm.
+
+    Generate a random pepper, and figure out the encrypted value of your password using the in-app salt. Place the encrypted password, along with the pepper in `server/auth/auth_certificate` with the encrypted password on the first line, and the pepper on the following line (if your pepper is very long, feel free to splice them into multiple lines).
+
+    ```bash
+    $ touch server/auth/auth_certificate
+    $ echo $encryptedPassword >> server/auth/auth_certificate
+    $ echo $generatedPepper >> server/auth/auth_certificate
+    ```
+
+3. Before you can run `docker-compose`, you will be required to build the image for the source code. You may tag the build as you wish (as long as the name is still `forte`).
     ```bash
     $ docker build -t forte .
     $ docker-compose up -d
     ```
-3. Check to make sure that all the containers are up and running as expected using `docker-compose ps`.
+4. Check to make sure that all the containers are up and running as expected using `docker-compose ps`.
     ```bash
     Name                 Command                          State   Ports
     ========================================================================================================

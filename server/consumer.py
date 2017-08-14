@@ -1,5 +1,6 @@
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
+from auth.authenticate import AuthenticationException, authenticate
 from task.download import execute_dl
 # from task.upload import execute_up
 from pprint import pprint
@@ -26,7 +27,7 @@ class KafConsumer(object):
 
                 time.sleep(backoff)
 
-        raise Exception("Could not connect to Kafka within timeout. Aborting.")
+        raise SystemExit("Could not connect to Kafka within timeout. Aborting.")
 
     def consume_events(self):
         print('Starting the consumer...')
@@ -40,9 +41,12 @@ class KafConsumer(object):
             # other messages in Kafka.
             try:
                 loaded_args = json.loads(message.value)
+                authenticate(loaded_args['auth_token'])
                 downloaded_file = execute_dl(loaded_args['url'])
                 print ("File %s downloaded successfully." % (downloaded_file))
                 # execute_up(downloaded_file)
+            except AuthenticationException:
+                print ("Dropping unauthenticated event: %s" % message.value)
             except TypeError:
                 pprint (json.loads(message.value))
             except ValueError as exception:

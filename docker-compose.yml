@@ -1,11 +1,12 @@
-version: "3"
+version: "3.1"
 services:
   web:
     image: forte
-    restart: on-failure
     depends_on:
       - zookeeper
       - kafka
+    secrets:
+      - auth_cert
     environment:
       KAFKA_CONSUMER_TOPIC: "forte-download"
       KAFKA_CONSUMER_BROKERS: kafka:9092
@@ -36,3 +37,6 @@ services:
     environment:
       KAFKA_REST_HOST_NAME: localhost:8082
       KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
+secrets:
+  auth_cert:
+    file: ./server/auth/auth_certificate
