@@ -4,11 +4,14 @@ from auth.authenticate import AuthenticationException, authenticate
 from task.download import execute_dl
 # from task.upload import execute_up
 from pprint import pprint
-import os, time, json
+import os, time, json, traceback
+
 
 class KafConsumer(object):
     def __init__(self, servers, topic, max_backoff = 10):
         backoff = 0.5
+
+        print ('Starting the consumer....')
 
         while (backoff < max_backoff):
             try:
@@ -29,32 +32,32 @@ class KafConsumer(object):
 
         raise SystemExit("Could not connect to Kafka within timeout. Aborting.")
 
+    def log_event(self, event, message):
+        print (message)
+        pprint (event)
+
     def consume_events(self):
-        print('Starting the consumer...')
+        print ("Polling for events....")
         for message in self.consumer:
             print ("Consuming event from topic:%s at offset:%s" % (
                 message.topic, message.offset))
+
+            loaded_args = json.loads(message.value)
 
             # Weird way of type checkking, but we use a try/except block here
             # because we want to make sure that the message contains URL in it.
             # If not, log the message and drop it. We don't want to block up
             # other messages in Kafka.
             try:
-                loaded_args = json.loads(message.value)
                 authenticate(loaded_args['auth_token'])
                 downloaded_file = execute_dl(loaded_args['url'])
-                print ("File %s downloaded successfully." % (downloaded_file))
+                print("File %s downloaded successfully." % (downloaded_file))
                 # execute_up(downloaded_file)
             except AuthenticationException:
-                print ("Dropping unauthenticated event: %s" % message.value)
-            except TypeError:
-                pprint (json.loads(message.value))
-            except ValueError as exception:
-                print ("Dropping malformed event: %s, reason: %s" %
-                    (message.value, exception))
-            except KeyError as exception:
-                print ("Dropping illegal event: %s, reason: %s" %
-                    (message.value, exception))
+                self.log_event(loaded_args, "Dropping unauthenticated event: ")
+            except Exception as exception:
+                self.log_event(loaded_args, "Exception caught, dropping event:")
+                traceback.print_exc()
 
 
 topic = os.environ.get('KAFKA_CONSUMER_TOPIC');
