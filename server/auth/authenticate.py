@@ -8,8 +8,8 @@ def get_auth_cert():
     cert_file = open('/run/secrets/auth_cert', 'r')
     cert_content = cert_file.readlines()
 
-    encrypted_password = cert_content[0]
-    pepper = reduce(lambda x, y: x + y, cert_content[1:])
+    encrypted_password = cert_content[0].strip()
+    pepper = reduce(lambda x, y: x + y, cert_content[1:]).encode('string_escape')
 
     return encrypted_password, pepper
 
@@ -24,8 +24,8 @@ def authenticate(password):
     hashed_password = salt_and_pepper(bytearray(password, 'utf-8'),
         bytearray(pepper.decode('string-escape')))
 
-    print ("Authenticate.....%s" %
-        ("Success" if hashed_password != encrypted_password else "Failed"))
+    auth_check = (hashed_password == encrypted_password)
+    print ("Authenticating event....%s" % ("Success" if auth_check else "Failure"))
 
-    if (hashed_password != encrypted_password):
+    if not auth_check:
         raise AuthenticationException()
