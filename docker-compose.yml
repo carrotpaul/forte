@@ -6,7 +6,7 @@ services:
       - zookeeper
       - kafka
     secrets:
-      - auth_cert
+      - api_auth_certificate
     environment:
       KAFKA_CONSUMER_TOPIC: "forte-download"
       KAFKA_CONSUMER_BROKERS: kafka:9092
@@ -39,5 +39,5 @@ services:
       KAFKA_REST_HOST_NAME: localhost:8082
       KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
 secrets:
-  auth_cert:
-    file: ./server/auth/auth_certificate
+  api_auth_certificate:
+    file: ./server/api_certificate.cred
