@@ -16,7 +16,9 @@ site you are currently browsing from.
 
 2. For the application to work, you will need to set an authorization token. The app itself authenticates using a salt & pepper hashing algorithm.
 
-    Generate a random pepper, and figure out the encrypted value of your password using the in-app salt. Place the encrypted password, along with the pepper in `server/auth/auth_certificate` with the encrypted password on the first line, and the pepper on the following line (if your pepper is very long, feel free to splice them into multiple lines).
+    Generate a random pepper, and figure out the encrypted value of your password using the in-app salt. Place the encrypted password, along with the pepper in `server/auth/auth_certificate` with the encrypted password on the first line, and the pepper on the following line.
+
+    **Note:** If your pepper is very long, feel free to splice it into multiple lines. However, this will append the `\n` character for each line, and therefore to the final pepper string itself. This will affect the encryption of your secret.
 
     ```bash
     $ touch server/auth/auth_certificate
