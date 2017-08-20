@@ -13,9 +13,9 @@ class MyLogger(object):
         print(msg)
 
 def execute_dl(url):
-    parent_path = os.environ.get('YOUTUBEDL_DOWNLOAD_PATH') or os.getcwd()
+    dir_path = os.environ.get('YOUTUBEDL_DOWNLOAD_PATH') or (os.getcwd() + '/tmp/')
     filename = hashlib.sha1(url).hexdigest()
-    file_path = parent_path + '/tmp/' + filename
+    file_path = dir_path + filename
 
     options = {
         'format': 'bestaudio/best',
