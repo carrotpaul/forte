@@ -7,6 +7,7 @@ services:
       - kafka
     secrets:
       - api_auth_certificate
+      - google_oauth_credentials
     environment:
       KAFKA_CONSUMER_TOPIC: "forte-download"
       KAFKA_CONSUMER_BROKERS: kafka:9092
@@ -41,3 +42,5 @@ services:
 secrets:
   api_auth_certificate:
     file: ./server/api_certificate.cred
+  google_oauth_credentials:
+    file: ./server/google_oauth.cred

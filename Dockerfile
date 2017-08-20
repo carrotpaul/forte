@@ -1,8 +1,21 @@
+# Python 2.7 Slim (the bare minimum to keep the image small)
 FROM python:2.7-slim
+
+# Set working directory
 WORKDIR /app
 ADD . /app
-RUN echo deb http://ftp.debian.org/debian jessie-backports main >> /etc/apt/sources.list
-RUN apt-get update
-RUN apt-get -y install ffmpeg
+
+# Install GCC and all required dependencies
+RUN apt-get update \
+    && apt-get install -y build-essential
+# Update source file to include Debian backport and install FFMPEG
+RUN echo deb http://ftp.debian.org/debian jessie-backports main \
+    >> /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install -y ffmpeg
+
+# Install python app dependencies
 RUN pip install -r requirements.txt
+
+# Start the app
 CMD ["python", "-u", "server/consumer.py"]
