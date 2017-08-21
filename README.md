@@ -26,7 +26,7 @@ site you are currently browsing from.
 
 3. Before you can run `docker-compose`, you will be required to build the image for the source code. You may tag the build as you wish (as long as the name is still `forte`).
     ```bash
-    $ docker build -t forte .
+    $ docker build --rm -t forte .
     $ docker-compose up -d
     ```
 4. Check to make sure that all the containers are up and running as expected using `docker-compose ps`.
