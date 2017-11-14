@@ -4,5 +4,4 @@ env/
 .env
 *.md
 tmp/
-auth_certificate
 *.cred

@@ -41,6 +41,6 @@ services:
       KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
 secrets:
   api_auth_certificate:
-    file: ./server/api_certificate.cred
+    file: ./server/secret/api_certificate.cred
   google_oauth_credentials:
-    file: ./server/google_oauth.cred
+    file: ./server/secret/google_oauth.cred
