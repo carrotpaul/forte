@@ -18,4 +18,4 @@ RUN echo deb http://ftp.debian.org/debian jessie-backports main \
 RUN pip install -r requirements.txt
 
 # Start the app
-CMD ["python", "-u", "server/consumer.py"]
+CMD ["python", "-u", "server/main.py"]

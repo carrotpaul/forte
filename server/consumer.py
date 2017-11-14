@@ -1,11 +1,10 @@
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
 from auth.authenticate import AuthenticationException, authenticate
-from task.download import execute_dl
-# from task.upload import execute_up
+from task import download, upload
+from task.upload import ClientLoginException, UploadException
 from pprint import pprint
-import os, time, json, traceback
-
+import time, json, traceback
 
 class KafConsumer(object):
     def __init__(self, servers, topic, max_backoff = 10):
@@ -36,7 +35,7 @@ class KafConsumer(object):
         print (message)
         pprint (event)
 
-    def consume_events(self):
+    def consume_events(self, upload_manager):
         print ("Polling for events....")
         for message in self.consumer:
             print ("Consuming event from topic:%s at offset:%s" % (
@@ -50,18 +49,16 @@ class KafConsumer(object):
             # other messages in Kafka.
             try:
                 authenticate(loaded_args['auth_token'])
-                downloaded_file = execute_dl(loaded_args['url'])
+
+                downloaded_file = download.execute(loaded_args['url'])
                 print("File %s downloaded successfully." % (downloaded_file))
-                # execute_up(downloaded_file)
+
+                upload.execute(upload_manager, downloaded_file)
             except AuthenticationException:
                 self.log_event(loaded_args, "Dropping unauthenticated event: ")
+            except UploadException as exception:
+                self.log_event(loaded_args,
+                    "Failed to upload file: %s, dropping event:" % exception)
             except Exception as exception:
                 self.log_event(loaded_args, "Exception caught, dropping event:")
                 traceback.print_exc()
-
-
-topic = os.environ.get('KAFKA_CONSUMER_TOPIC');
-brokers = os.environ.get('KAFKA_CONSUMER_BROKERS');
-
-consumer = KafConsumer(brokers, topic)
-consumer.consume_events();

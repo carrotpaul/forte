@@ -12,7 +12,7 @@ class MyLogger(object):
     def error(self, msg):
         print(msg)
 
-def execute_dl(url):
+def execute(url):
     dir_path = os.environ.get('YOUTUBEDL_DOWNLOAD_PATH') or (os.getcwd() + '/tmp/')
     filename = hashlib.sha1(url).hexdigest()
     file_path = dir_path + filename
