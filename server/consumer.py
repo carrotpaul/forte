@@ -4,7 +4,7 @@ from auth.authenticate import AuthenticationException, authenticate
 from task import download, upload
 from task.upload import ClientLoginException, UploadException
 from pprint import pprint
-import time, json, traceback
+import time, json, traceback, threading
 
 class KafConsumer(object):
     def __init__(self, servers, topic, max_backoff = 10):
@@ -14,9 +14,11 @@ class KafConsumer(object):
 
         while (backoff < max_backoff):
             try:
-                self.consumer = KafkaConsumer(topic,
+                self.consumer = KafkaConsumer(
+                    topic,
                     group_id='forte-server',
-                    bootstrap_servers=servers)
+                    bootstrap_servers=servers
+                )
 
                 print ("Established connection to Kafka with brokers %s" % servers)
                 return
@@ -35,30 +37,32 @@ class KafConsumer(object):
         print (message)
         pprint (event)
 
+    def task_execution(self, download_url, upload_manager):
+        downloaded_file = download.execute(download_url)
+        print("File %s downloaded successfully." % (downloaded_file))
+
+        upload.execute(upload_manager, downloaded_file)
+
     def consume_events(self, upload_manager):
         print ("Polling for events....")
         for message in self.consumer:
             print ("Consuming event from topic:%s at offset:%s" % (
                 message.topic, message.offset))
 
+            # Decrypt the JSON payload
             loaded_args = json.loads(message.value)
 
-            # Weird way of type checkking, but we use a try/except block here
-            # because we want to make sure that the message contains URL in it.
-            # If not, log the message and drop it. We don't want to block up
-            # other messages in Kafka.
             try:
+                # Authenticate the message.
                 authenticate(loaded_args['auth_token'])
-
-                downloaded_file = download.execute(loaded_args['url'])
-                print("File %s downloaded successfully." % (downloaded_file))
-
-                upload.execute(upload_manager, downloaded_file)
             except AuthenticationException:
+                # We couldn't claim that this came from us. Drop the event.
                 self.log_event(loaded_args, "Dropping unauthenticated event: ")
-            except UploadException as exception:
-                self.log_event(loaded_args,
-                    "Failed to upload file: %s, dropping event:" % exception)
-            except Exception as exception:
-                self.log_event(loaded_args, "Exception caught, dropping event:")
-                traceback.print_exc()
+
+            # Now do the actual work in an Thread.
+            # Note that (for now), we will treat the event as a fire and forget
+            # task, so we won't be joining the thread.
+            threading.Thread(
+                target=task_execution,
+                args=[loaded_args['url'], upload_manager]
+            ).start()
