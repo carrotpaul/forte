@@ -1,5 +1,7 @@
 .env
-/env
+env/
 *.pyc
 tmp/
 *.cred
+extension/scripts/secret.js
+push_to_kafka.sh

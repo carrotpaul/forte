@@ -5,3 +5,6 @@ env/
 *.md
 tmp/
 *.cred
+*.pyc
+extension/
+kubernetes/
