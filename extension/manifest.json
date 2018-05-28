@@ -2,9 +2,16 @@
   "manifest_version": 2,
   "name": "Forte",
   "version": "1.0",
-  "permissions": ["declarativeContent"],
+  "permissions": [
+    "declarativeContent",
+    "tabs"
+  ],
   "background": {
-    "scripts": ["scripts/init.js"],
+    "scripts": [
+      "scripts/secret.js",
+      "scripts/helpers.js",
+      "scripts/init.js"
+    ],
     "persistent": false
   },
   "page_action": {
