@@ -16,7 +16,6 @@ services:
       - ./server:/app/server
   zookeeper:
     image: zookeeper
-    restart: unless-stopped
     ports:
       - "2181:2181"
   kafka:
