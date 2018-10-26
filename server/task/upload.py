@@ -4,6 +4,9 @@ from oauth2client.client import OAuth2Credentials
 from pprint import pprint
 import os, json, ast
 
+total_retries = 5
+backoff = 1
+
 class ClientLoginException(Exception):
     pass
 
@@ -46,8 +49,19 @@ def execute(manager, filename, tags={}):
     set_tags(filename, tags)
 
     print ("Uploading %s....." % filename, end='')
-    uploaded, _, rejected = manager.client.upload(filename)
-    print ("Failed" if rejected else "Success")
 
-    if rejected:
-        raise UploadException(rejected[filename])
+    retries = 0
+    while ( retries <= total_retries ):
+        uploaded, _, rejected = manager.client.upload(filename)
+
+        if rejected and retries == total_retries:
+            print ("Upload failed. Number of retries exceeded", attempts, total_retries)
+            raise UploadException(rejected[filename])
+        elif rejected:
+            retries += 1
+            print ("Upload failed. Retrying %s / %s", attempts, total_retries)
+            time.sleep(backoff)
+        else:
+            print ("Success")
+            break
+
