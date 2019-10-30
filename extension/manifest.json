@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+  "name": "Forte",
+  "version": "1.0",
+  "permissions": [
+    "declarativeContent",
+    "tabs"
+  ],
+  "background": {
+    "scripts": [
+      "scripts/secret.js",
+      "scripts/helpers.js",
+      "scripts/init.js"
+    ],
+    "persistent": false
+  },
+  "page_action": {
+    "default_icon": "assets/icon.png"
+  }
+}
