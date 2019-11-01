@@ -1,5 +1,5 @@
-# Python 2.7 Slim (the bare minimum to keep the image small)
-FROM python:2.7-slim
+# Python 3.7 Slim (the bare minimum to keep the image small)
+FROM python:3.7-slim
 
 # Set working directory
 WORKDIR /app
