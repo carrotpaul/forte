@@ -46,8 +46,8 @@ class KafConsumer(object):
     def consume_events(self, upload_manager):
         print ("Polling for events....")
         for message in self.consumer:
-            print ("Consuming event from topic:%s at offset:%s" % (
-                message.topic, message.offset))
+            print ("[%s] Consuming event from partition:%s at offset:%s" % (
+                message.topic, message.partition, message.offset))
 
             # Decrypt the JSON payload
             loaded_args = json.loads(message.value)
